@@ -3,6 +3,7 @@ package com.amazonaws.kinesisvideo.demoapp.fragment;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.amazonaws.kinesisvideo.client.KinesisVideoClientConfiguration;
 import com.amazonaws.kinesisvideo.common.exception.KinesisVideoException;
+import com.amazonaws.kinesisvideo.demoapp.ClipFragment;
 import com.amazonaws.kinesisvideo.demoapp.KinesisVideoDemoApp;
 import com.amazonaws.kinesisvideo.demoapp.R;
 import com.amazonaws.kinesisvideo.demoapp.activity.SimpleNavActivity;
@@ -26,6 +28,8 @@ import com.amazonaws.regions.Regions;
 import java.util.ArrayList;
 import java.util.List;
 
+import hackathon.ReportKVSClipClient;
+
 public class StreamingFragment extends Fragment implements TextureView.SurfaceTextureListener {
     public static final String KEY_MEDIA_SOURCE_CONFIGURATION_1 = "mediaSourceConfiguration1";
     public static final String KEY_MEDIA_SOURCE_CONFIGURATION_2 = "mediaSourceConfiguration2";
@@ -34,6 +38,7 @@ public class StreamingFragment extends Fragment implements TextureView.SurfaceTe
     private static final String TAG = StreamingFragment.class.getSimpleName();
 
     private Button mStartStreamingButton;
+    private Button mSearchClips;
     private KinesisVideoClient mKinesisVideoClient;
     private String mStreamName;
     private AndroidCameraMediaSourceConfiguration mConfiguration1;
@@ -42,6 +47,8 @@ public class StreamingFragment extends Fragment implements TextureView.SurfaceTe
     private AndroidCameraMediaSource mCameraMediaSource2;
 
     private SimpleNavActivity navActivity;
+    private Long streamingStartTime;
+    private Long streamingEndTime;
 
     public static StreamingFragment newInstance(SimpleNavActivity navActivity) {
         StreamingFragment s = new StreamingFragment();
@@ -91,7 +98,15 @@ public class StreamingFragment extends Fragment implements TextureView.SurfaceTe
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mStartStreamingButton = (Button) view.findViewById(R.id.start_streaming);
         mStartStreamingButton.setOnClickListener(stopStreamingWhenClicked());
+        mSearchClips = (Button) view.findViewById(R.id.search_clips);
+        //mSearchClips.setOnClickListener(openSearchClipFragment());
     }
+
+//    private View.OnClickListener openSearchClipFragment() {
+//        final ClipFragment searchClipFragment = ClipFragment.newInstance(2);
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        fragmentManager.beginTransaction().replace(R.id.content_simple, fragment).commit();
+//    }
 
     @Override
     public void onResume() {
@@ -123,6 +138,7 @@ public class StreamingFragment extends Fragment implements TextureView.SurfaceTe
 
             mCameraMediaSource1.start();
             mCameraMediaSource2.start();
+            streamingStartTime = System.currentTimeMillis();
             Toast.makeText(getActivity(), "resumed streaming", Toast.LENGTH_SHORT).show();
             mStartStreamingButton.setText(getActivity().getText(R.string.stop_streaming));
         } catch (final KinesisVideoException e) {
@@ -130,6 +146,7 @@ public class StreamingFragment extends Fragment implements TextureView.SurfaceTe
             Toast.makeText(getActivity(), "failed to resume streaming", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void pauseStreaming() {
         try {
@@ -139,6 +156,10 @@ public class StreamingFragment extends Fragment implements TextureView.SurfaceTe
 
             mCameraMediaSource1.stop();
             mCameraMediaSource2.stop();
+            streamingEndTime = System.currentTimeMillis();
+            // TODO : Call ReportKVSClient here
+            //ReportKVSClipClient reportKVSClipClient = //
+
             Toast.makeText(getActivity(), "stopped streaming", Toast.LENGTH_SHORT).show();
             mStartStreamingButton.setText(getActivity().getText(R.string.start_streaming));
         } catch (final KinesisVideoException e) {

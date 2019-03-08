@@ -88,6 +88,16 @@
                     android:padding="10dp"
                     android:background="@drawable/button_selector"
                     android:layout_margin="10dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/search_clips"
+                android:text="Search Clips"
+                android:padding="10dp"
+                android:background="@drawable/button_selector"
+                android:layout_margin="60dp" />
+
             </RelativeLayout>
     </LinearLayout>
 </ScrollView>
